@@ -10,3 +10,9 @@ func PostProduct(ctr controllers.AppController) gin.HandlerFunc {
 		ctr.HandleCreateProduct(ctx)
 	}
 }
+
+func PutProduct(ctr controllers.AppController) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		ctr.HandleUpdateProduct(ctx)
+	}
+}

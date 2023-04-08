@@ -11,10 +11,10 @@ type productRepository struct {
 
 type ProductRepository interface {
 	CreateProduct(product *domain.Product) (*domain.Product, error)
-	UpdateProduct(id uint, product *domain.Product) (*domain.Product, error)
-	DeleteProduct(id uint) error
+	UpdateProduct(id int, product *domain.Product) (*domain.Product, error)
+	DeleteProduct(id int) error
 	GetProducts() ([]*domain.Product, error)
-	GetProductById(id uint) (*domain.Product, error)
+	GetProductById(id int) (*domain.Product, error)
 }
 
 func NewProductRepository(db *gorm.DB) ProductRepository {
@@ -30,7 +30,7 @@ func (p productRepository) CreateProduct(product *domain.Product) (*domain.Produ
 	return product, nil
 }
 
-func (p productRepository) UpdateProduct(id uint, product *domain.Product) (*domain.Product, error) {
+func (p productRepository) UpdateProduct(id int, product *domain.Product) (*domain.Product, error) {
 	var updatedProduct = &domain.Product{}
 
 	err := p.DB.Model(updatedProduct).
@@ -48,7 +48,7 @@ func (p productRepository) UpdateProduct(id uint, product *domain.Product) (*dom
 	return updatedProduct, nil
 }
 
-func (p productRepository) DeleteProduct(id uint) error {
+func (p productRepository) DeleteProduct(id int) error {
 	return p.DB.Model(&domain.Product{}).Delete("id = ?", id).Error
 }
 
@@ -67,7 +67,7 @@ func (p productRepository) GetProducts() ([]*domain.Product, error) {
 	return products, nil
 }
 
-func (p productRepository) GetProductById(id uint) (*domain.Product, error) {
+func (p productRepository) GetProductById(id int) (*domain.Product, error) {
 	var product = &domain.Product{}
 
 	err := p.DB.

@@ -5,8 +5,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"go-product/domain"
 	"go-product/repository"
+	"gorm.io/gorm"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 type productController struct {
@@ -47,6 +49,7 @@ func (p productController) HandleCreateProduct(c *gin.Context) {
 			Status:  "INTERNAL_SERVER_ERROR",
 			Message: "An error occurred while processing your request. Please try again later",
 		})
+		return
 	}
 
 	c.JSON(http.StatusOK, domain.ApiResponse{
@@ -58,8 +61,47 @@ func (p productController) HandleCreateProduct(c *gin.Context) {
 }
 
 func (p productController) HandleUpdateProduct(c *gin.Context) {
-	//TODO implement me
-	panic("implement me")
+	payload := c.MustGet("payload").(domain.ProductRequest)
+
+	var product domain.Product
+	product.FromRequest(payload)
+
+	productId, err := strconv.Atoi(c.Param("productId"))
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, domain.ApiResponse{
+			Code:    http.StatusBadRequest,
+			Status:  "BAD_REQUEST",
+			Message: "Invalid product id",
+		})
+		return
+	}
+
+	result, err := p.productRepository.UpdateProduct(productId, &product)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			c.AbortWithStatusJSON(http.StatusNotFound, domain.ApiResponse{
+				Code:    http.StatusNotFound,
+				Status:  "NOT_FOUND",
+				Message: "Product not found",
+			})
+			return
+		}
+
+		log.Println(err)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, domain.ApiResponse{
+			Code:    http.StatusInternalServerError,
+			Status:  "INTERNAL_SERVER_ERROR",
+			Message: "An error occurred while processing your request. Please try again later",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, domain.ApiResponse{
+		Code:    http.StatusOK,
+		Status:  "OK",
+		Message: "Product updated successfully",
+		Data:    result.ToResponse(),
+	})
 }
 
 func (p productController) HandleDeleteProduct(c *gin.Context) {

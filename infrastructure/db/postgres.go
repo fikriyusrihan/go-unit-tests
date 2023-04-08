@@ -16,9 +16,14 @@ const (
 	dbname   = "db-go-sql"
 )
 
+var (
+	db  *gorm.DB
+	err error
+)
+
 func NewPostgresDB() (*gorm.DB, error) {
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=disable", host, username, password, dbname, port)
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}
@@ -30,4 +35,8 @@ func NewPostgresDB() (*gorm.DB, error) {
 
 	log.Println("database connection successfully created")
 	return db, nil
+}
+
+func GetDBInstance() *gorm.DB {
+	return db
 }
