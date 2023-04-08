@@ -22,3 +22,9 @@ func DeleteProduct(ctr controllers.AppController) gin.HandlerFunc {
 		ctr.HandleDeleteProduct(ctx)
 	}
 }
+
+func GetProducts(ctr controllers.AppController) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		ctr.HandleGetAllProduct(ctx)
+	}
+}

@@ -24,6 +24,7 @@ func NewRouter(ctr controllers.AppController) *gin.Engine {
 		{
 			adminAccess.PUT(":productId", middleware.ProductRequestValidator(), handler.PutProduct(ctr))
 			adminAccess.DELETE(":productId", handler.DeleteProduct(ctr))
+			adminAccess.GET("/", handler.GetProducts(ctr))
 		}
 	}
 

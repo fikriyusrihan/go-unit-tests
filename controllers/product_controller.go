@@ -143,8 +143,28 @@ func (p productController) HandleDeleteProduct(c *gin.Context) {
 }
 
 func (p productController) HandleGetAllProduct(c *gin.Context) {
-	//TODO implement me
-	panic("implement me")
+	result, err := p.productRepository.GetProducts()
+	if err != nil {
+		log.Println(err)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, domain.ApiResponse{
+			Code:    http.StatusInternalServerError,
+			Status:  "INTERNAL_SERVER_ERROR",
+			Message: "An error occurred while processing your request. Please try again later",
+		})
+		return
+	}
+
+	var response []domain.ProductResponse
+	for _, product := range result {
+		response = append(response, product.ToResponse())
+	}
+
+	c.JSON(http.StatusOK, domain.ApiResponse{
+		Code:    http.StatusOK,
+		Status:  "OK",
+		Message: "Product list retrieved successfully",
+		Data:    response,
+	})
 }
 
 func (p productController) HandleGetProductById(c *gin.Context) {
