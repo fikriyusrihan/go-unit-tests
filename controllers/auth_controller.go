@@ -102,7 +102,6 @@ func (ctr authController) HandleUserRegister(c *gin.Context) {
 				Status:  "CONFLICT",
 				Message: "User with the same email already exists. Please use a different email and try again",
 			})
-			return
 		}
 
 		c.AbortWithStatusJSON(http.StatusInternalServerError, domain.ApiResponse{
@@ -110,7 +109,6 @@ func (ctr authController) HandleUserRegister(c *gin.Context) {
 			Status:  "INTERNAL_SERVER_ERROR",
 			Message: "Internal server error",
 		})
-		return
 	}
 
 	c.JSON(http.StatusOK, domain.ApiResponse{

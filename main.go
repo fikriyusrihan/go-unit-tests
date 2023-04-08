@@ -20,9 +20,11 @@ func main() {
 	}
 
 	userRepository := repository.NewUserRepository(database)
+	productRepository := repository.NewProductRepository(database)
 
 	authController := controllers.NewAuthController(userRepository)
-	appController := controllers.NewAppController(authController)
+	productController := controllers.NewProductController(userRepository, productRepository)
+	appController := controllers.NewAppController(authController, productController)
 
 	log.Println("server will run on port: ", ServerPort)
 	err = router.NewRouter(appController).Run(ServerPort)

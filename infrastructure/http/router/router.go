@@ -16,5 +16,10 @@ func NewRouter(ctr controllers.AppController) *gin.Engine {
 		users.POST("/register", middleware.UserRequestValidator(), handler.PostUserRegister(ctr))
 	}
 
+	products := router.Group("/products", middleware.Authentication())
+	{
+		products.POST("/", middleware.ProductRequestValidator(), handler.PostProduct(ctr))
+	}
+
 	return router
 }
