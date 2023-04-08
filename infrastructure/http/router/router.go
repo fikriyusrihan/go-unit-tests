@@ -19,7 +19,12 @@ func NewRouter(ctr controllers.AppController) *gin.Engine {
 	products := router.Group("/products", middleware.Authentication())
 	{
 		products.POST("/", middleware.ProductRequestValidator(), handler.PostProduct(ctr))
-		products.PUT("/:productId", middleware.AdminAuthorization(), middleware.ProductRequestValidator(), handler.PutProduct(ctr))
+
+		adminAccess := products.Group("/", middleware.AdminAuthorization())
+		{
+			adminAccess.PUT(":productId", middleware.ProductRequestValidator(), handler.PutProduct(ctr))
+			adminAccess.DELETE(":productId", handler.DeleteProduct(ctr))
+		}
 	}
 
 	return router

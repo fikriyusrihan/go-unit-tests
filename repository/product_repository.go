@@ -49,6 +49,12 @@ func (p productRepository) UpdateProduct(id int, product *domain.Product) (*doma
 }
 
 func (p productRepository) DeleteProduct(id int) error {
+	var product = &domain.Product{}
+	err := p.DB.Model(&domain.Product{}).Where("id = ?", id).First(product).Error
+	if err != nil {
+		return err
+	}
+
 	return p.DB.Model(&domain.Product{}).Delete("id = ?", id).Error
 }
 

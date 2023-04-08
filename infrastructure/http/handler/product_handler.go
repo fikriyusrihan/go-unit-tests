@@ -16,3 +16,9 @@ func PutProduct(ctr controllers.AppController) gin.HandlerFunc {
 		ctr.HandleUpdateProduct(ctx)
 	}
 }
+
+func DeleteProduct(ctr controllers.AppController) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		ctr.HandleDeleteProduct(ctx)
+	}
+}
