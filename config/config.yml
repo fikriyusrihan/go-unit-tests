@@ -1,0 +1,13 @@
+server:
+  port: 8000
+
+database:
+  username: postgres
+  password: postgres
+  host: localhost
+  port: 5432
+  dbname: db-go-sql
+  sslMode: disable
+
+jwt:
+  signatureKey: YOUR_SECRET_KEY

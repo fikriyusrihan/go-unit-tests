@@ -2,18 +2,11 @@ package db
 
 import (
 	"fmt"
+	"go-product/config"
 	"go-product/domain"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"log"
-)
-
-const (
-	host     = "localhost"
-	port     = 5432
-	username = "postgres"
-	password = "postgres"
-	dbname   = "db-go-sql"
 )
 
 var (
@@ -22,7 +15,14 @@ var (
 )
 
 func NewPostgresDB() (*gorm.DB, error) {
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=disable", host, username, password, dbname, port)
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s",
+		config.C.Database.Host,
+		config.C.Database.Username,
+		config.C.Database.Password,
+		config.C.Database.DBName,
+		config.C.Database.Port,
+		config.C.Database.SSLMode,
+	)
 	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		return nil, err

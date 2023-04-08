@@ -4,12 +4,12 @@ import (
 	"errors"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"go-product/config"
 	"strings"
 	"time"
 )
 
-// TODO: Move this to .env file
-const secretKey = "$2a$10$Q84zan8("
+var secretKey = config.C.JWT.SignatureKey
 
 func GenerateToken(id uint, email string) (string, error) {
 	claims := jwt.MapClaims{
