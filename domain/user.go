@@ -5,6 +5,7 @@ type User struct {
 	FullName string `gorm:"notNull"`
 	Email    string `gorm:"notNull;unique"`
 	Password string `gorm:"notNull"`
+	IsAdmin  bool   `gorm:"default:false"`
 	Products []Product
 }
 
