@@ -1,10 +1,8 @@
 package main
 
 import (
-	"go-product/controllers"
-	"go-product/infrastructure/db"
+	"go-product/di"
 	"go-product/infrastructure/http/router"
-	"go-product/repository"
 	"log"
 )
 
@@ -13,18 +11,11 @@ const (
 )
 
 func main() {
-	database, err := db.NewPostgresDB()
+	appController, err := di.InitializeAppController()
 	if err != nil {
-		log.Fatalln("an error occurred while connecting to database: ", err)
+		log.Fatalln("an error occurred while initializing the app: ", err)
 		return
 	}
-
-	userRepository := repository.NewUserRepository(database)
-	productRepository := repository.NewProductRepository(database)
-
-	authController := controllers.NewAuthController(userRepository)
-	productController := controllers.NewProductController(userRepository, productRepository)
-	appController := controllers.NewAppController(authController, productController)
 
 	log.Println("server will run on port: ", ServerPort)
 	err = router.NewRouter(appController).Run(ServerPort)
