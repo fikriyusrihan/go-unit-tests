@@ -168,6 +168,40 @@ func (p productController) HandleGetAllProduct(c *gin.Context) {
 }
 
 func (p productController) HandleGetProductById(c *gin.Context) {
-	//TODO implement me
-	panic("implement me")
+	productId, err := strconv.Atoi(c.Param("productId"))
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, domain.ApiResponse{
+			Code:    http.StatusBadRequest,
+			Status:  "BAD_REQUEST",
+			Message: "Invalid product id",
+		})
+		return
+	}
+
+	result, err := p.productRepository.GetProductById(productId)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			c.AbortWithStatusJSON(http.StatusNotFound, domain.ApiResponse{
+				Code:    http.StatusNotFound,
+				Status:  "NOT_FOUND",
+				Message: "Product not found",
+			})
+			return
+		}
+
+		log.Println(err)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, domain.ApiResponse{
+			Code:    http.StatusInternalServerError,
+			Status:  "INTERNAL_SERVER_ERROR",
+			Message: "An error occurred while processing your request. Please try again later",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, domain.ApiResponse{
+		Code:    http.StatusOK,
+		Status:  "OK",
+		Message: "Product retrieved successfully",
+		Data:    result.ToResponse(),
+	})
 }

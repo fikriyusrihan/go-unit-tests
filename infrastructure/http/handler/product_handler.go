@@ -28,3 +28,9 @@ func GetProducts(ctr controllers.AppController) gin.HandlerFunc {
 		ctr.HandleGetAllProduct(ctx)
 	}
 }
+
+func GetProductById(ctr controllers.AppController) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		ctr.HandleGetProductById(ctx)
+	}
+}
