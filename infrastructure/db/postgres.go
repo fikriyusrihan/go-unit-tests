@@ -2,7 +2,7 @@ package db
 
 import (
 	"fmt"
-	"go-product/domain/config"
+	"go-product/config"
 	"go-product/domain/entity"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

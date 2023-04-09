@@ -4,7 +4,7 @@ import (
 	"errors"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	"go-product/domain/config"
+	"go-product/config"
 	"strings"
 	"time"
 )

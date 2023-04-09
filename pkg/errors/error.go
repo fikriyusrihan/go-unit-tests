@@ -24,27 +24,11 @@ func (e ErrorData) Status() string {
 	return e.StatusData
 }
 
-func NewBadRequestError(message string) Error {
-	return &ErrorData{
-		MessageData: message,
-		CodeData:    400,
-		StatusData:  "BAD_REQUEST",
-	}
-}
-
 func NewUnauthenticatedError(message string) Error {
 	return &ErrorData{
 		MessageData: message,
 		CodeData:    401,
 		StatusData:  "UNAUTHENTICATED",
-	}
-}
-
-func NewUnauthorizedError(message string) Error {
-	return &ErrorData{
-		MessageData: message,
-		CodeData:    403,
-		StatusData:  "UNAUTHORIZED",
 	}
 }
 

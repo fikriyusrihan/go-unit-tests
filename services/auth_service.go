@@ -6,7 +6,6 @@ import (
 	"go-product/pkg/errors"
 	"go-product/pkg/helpers"
 	"go-product/repositories/i_repositories"
-	"gorm.io/gorm"
 	"log"
 )
 
@@ -24,29 +23,22 @@ func NewAuthService(userRepository i_repositories.UserRepository) AuthService {
 }
 
 func (a authService) Login(request dto.AuthenticationRequest) (*dto.AuthenticationResponse, errors.Error) {
-	user, err := a.userRepository.GetUserByEmail(request.Email)
-	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			httpError := errors.NewUnauthenticatedError("Invalid email or password. Please check your email and password and try again")
-			return nil, httpError
-		}
-
-		log.Println(err)
-		httpError := errors.NewInternalServerError("An error occurred while processing your request. Please try again later")
-		return nil, httpError
+	user, errs := a.userRepository.GetUserByEmail(request.Email)
+	if errs != nil {
+		return nil, errs
 	}
 
 	isValidPassword := helpers.ValidatePassword(user.Password, request.Password)
 	if !isValidPassword {
-		httpError := errors.NewUnauthenticatedError("Invalid email or password. Please check your email and password and try again")
-		return nil, httpError
+		newErrs := errors.NewUnauthenticatedError("Invalid email or password. Please check your email and password and try again")
+		return nil, newErrs
 	}
 
 	token, err := helpers.GenerateToken(user.ID, user.Email)
 	if err != nil {
 		log.Println(err)
-		httpError := errors.NewInternalServerError("An error occurred while processing your request. Please try again later")
-		return nil, httpError
+		newErrs := errors.NewInternalServerError("An error occurred while processing your request. Please try again later")
+		return nil, newErrs
 	}
 
 	response := &dto.AuthenticationResponse{
@@ -63,21 +55,14 @@ func (a authService) Register(payload dto.UserRequest) (*dto.UserResponse, error
 	hashedPassword, err := helpers.HashPassword(user.Password)
 	if err != nil {
 		log.Println(err)
-		httpError := errors.NewInternalServerError("An error occurred while processing your request. Please try again later")
-		return nil, httpError
+		newErrs := errors.NewInternalServerError("An error occurred while processing your request. Please try again later")
+		return nil, newErrs
 	}
 
 	user.Password = hashedPassword
-	result, err := a.userRepository.CreateUser(&user)
-	if err != nil {
-		if err == gorm.ErrDuplicatedKey {
-			httpError := errors.NewConflictError("Email already exists")
-			return nil, httpError
-		}
-
-		log.Println(err)
-		httpError := errors.NewInternalServerError("An error occurred while processing your request. Please try again later")
-		return nil, httpError
+	result, errs := a.userRepository.CreateUser(&user)
+	if errs != nil {
+		return nil, errs
 	}
 
 	response := result.ToResponse()
