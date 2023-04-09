@@ -4,7 +4,7 @@ import (
 	"go-product/domain/dto"
 	"go-product/domain/entity"
 	"go-product/pkg/errors"
-	"go-product/repositories/i_repositories"
+	"go-product/repositories/repo_interfaces"
 	"log"
 )
 
@@ -17,10 +17,10 @@ type ProductService interface {
 }
 
 type productService struct {
-	productRepository i_repositories.ProductRepository
+	productRepository repo_interfaces.ProductRepository
 }
 
-func NewProductService(productRepository i_repositories.ProductRepository) ProductService {
+func NewProductService(productRepository repo_interfaces.ProductRepository) ProductService {
 	return &productService{productRepository}
 }
 

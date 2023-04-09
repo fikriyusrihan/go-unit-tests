@@ -3,7 +3,7 @@ package repositories
 import (
 	"go-product/domain/entity"
 	"go-product/pkg/errors"
-	"go-product/repositories/i_repositories"
+	"go-product/repositories/repo_interfaces"
 	"gorm.io/gorm"
 	"log"
 )
@@ -12,7 +12,7 @@ type productRepository struct {
 	*gorm.DB
 }
 
-func NewProductRepository(db *gorm.DB) i_repositories.ProductRepository {
+func NewProductRepository(db *gorm.DB) repo_interfaces.ProductRepository {
 	return &productRepository{db}
 }
 

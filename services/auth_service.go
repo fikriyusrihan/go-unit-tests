@@ -5,7 +5,7 @@ import (
 	"go-product/domain/entity"
 	"go-product/pkg/errors"
 	"go-product/pkg/helpers"
-	"go-product/repositories/i_repositories"
+	"go-product/repositories/repo_interfaces"
 	"log"
 )
 
@@ -15,10 +15,10 @@ type AuthService interface {
 }
 
 type authService struct {
-	userRepository i_repositories.UserRepository
+	userRepository repo_interfaces.UserRepository
 }
 
-func NewAuthService(userRepository i_repositories.UserRepository) AuthService {
+func NewAuthService(userRepository repo_interfaces.UserRepository) AuthService {
 	return &authService{userRepository}
 }
 

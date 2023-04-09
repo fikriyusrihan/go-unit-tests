@@ -1,4 +1,4 @@
-package i_repositories
+package repo_interfaces
 
 import (
 	"go-product/domain/entity"
