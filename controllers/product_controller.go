@@ -4,17 +4,13 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"go-product/domain/dto"
-	"go-product/domain/entity"
-	"go-product/repositories/i_repositories"
-	"gorm.io/gorm"
-	"log"
+	"go-product/services"
 	"net/http"
 	"strconv"
 )
 
 type productController struct {
-	userRepository    i_repositories.UserRepository
-	productRepository i_repositories.ProductRepository
+	productService services.ProductService
 }
 
 type ProductController interface {
@@ -26,29 +22,22 @@ type ProductController interface {
 }
 
 func NewProductController(
-	userRepository i_repositories.UserRepository,
-	productRepository i_repositories.ProductRepository,
+	productService services.ProductService,
 ) ProductController {
-	return &productController{userRepository, productRepository}
+	return &productController{productService}
 }
 
 func (p productController) HandleCreateProduct(c *gin.Context) {
 	payload := c.MustGet("payload").(dto.ProductRequest)
 	claim := c.MustGet("claim").(jwt.MapClaims)
-
-	var product entity.Product
-	product.FromRequest(payload)
-
 	uid := uint(claim["id"].(float64))
-	product.UserID = uid
 
-	result, err := p.productRepository.CreateProduct(&product)
+	response, err := p.productService.CreateProduct(uid, payload)
 	if err != nil {
-		log.Println(err)
-		c.AbortWithStatusJSON(http.StatusInternalServerError, dto.ApiResponse{
-			Code:    http.StatusInternalServerError,
-			Status:  "INTERNAL_SERVER_ERROR",
-			Message: "An error occurred while processing your request. Please try again later",
+		c.AbortWithStatusJSON(err.Code(), dto.ApiResponse{
+			Code:    err.Code(),
+			Status:  err.Status(),
+			Message: err.Message(),
 		})
 		return
 	}
@@ -57,15 +46,12 @@ func (p productController) HandleCreateProduct(c *gin.Context) {
 		Code:    http.StatusCreated,
 		Status:  "CREATED",
 		Message: "Product created successfully",
-		Data:    result.ToResponse(),
+		Data:    response,
 	})
 }
 
 func (p productController) HandleUpdateProduct(c *gin.Context) {
 	payload := c.MustGet("payload").(dto.ProductRequest)
-
-	var product entity.Product
-	product.FromRequest(payload)
 
 	productId, err := strconv.Atoi(c.Param("productId"))
 	if err != nil {
@@ -77,22 +63,12 @@ func (p productController) HandleUpdateProduct(c *gin.Context) {
 		return
 	}
 
-	result, err := p.productRepository.UpdateProduct(productId, &product)
-	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			c.AbortWithStatusJSON(http.StatusNotFound, dto.ApiResponse{
-				Code:    http.StatusNotFound,
-				Status:  "NOT_FOUND",
-				Message: "Product not found",
-			})
-			return
-		}
-
-		log.Println(err)
-		c.AbortWithStatusJSON(http.StatusInternalServerError, dto.ApiResponse{
-			Code:    http.StatusInternalServerError,
-			Status:  "INTERNAL_SERVER_ERROR",
-			Message: "An error occurred while processing your request. Please try again later",
+	response, errs := p.productService.UpdateProduct(productId, payload)
+	if errs != nil {
+		c.AbortWithStatusJSON(errs.Code(), dto.ApiResponse{
+			Code:    errs.Code(),
+			Status:  errs.Status(),
+			Message: errs.Message(),
 		})
 		return
 	}
@@ -101,7 +77,7 @@ func (p productController) HandleUpdateProduct(c *gin.Context) {
 		Code:    http.StatusOK,
 		Status:  "OK",
 		Message: "Product updated successfully",
-		Data:    result.ToResponse(),
+		Data:    response,
 	})
 }
 
@@ -116,22 +92,12 @@ func (p productController) HandleDeleteProduct(c *gin.Context) {
 		return
 	}
 
-	err = p.productRepository.DeleteProduct(productId)
-	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			c.AbortWithStatusJSON(http.StatusNotFound, dto.ApiResponse{
-				Code:    http.StatusNotFound,
-				Status:  "NOT_FOUND",
-				Message: "Product not found",
-			})
-			return
-		}
-
-		log.Println(err)
-		c.AbortWithStatusJSON(http.StatusInternalServerError, dto.ApiResponse{
-			Code:    http.StatusInternalServerError,
-			Status:  "INTERNAL_SERVER_ERROR",
-			Message: "An error occurred while processing your request. Please try again later",
+	errs := p.productService.DeleteProduct(productId)
+	if errs != nil {
+		c.AbortWithStatusJSON(errs.Code(), dto.ApiResponse{
+			Code:    errs.Code(),
+			Status:  errs.Status(),
+			Message: errs.Message(),
 		})
 		return
 	}
@@ -144,20 +110,14 @@ func (p productController) HandleDeleteProduct(c *gin.Context) {
 }
 
 func (p productController) HandleGetAllProduct(c *gin.Context) {
-	result, err := p.productRepository.GetProducts()
+	response, err := p.productService.GetProducts()
 	if err != nil {
-		log.Println(err)
-		c.AbortWithStatusJSON(http.StatusInternalServerError, dto.ApiResponse{
-			Code:    http.StatusInternalServerError,
-			Status:  "INTERNAL_SERVER_ERROR",
-			Message: "An error occurred while processing your request. Please try again later",
+		c.AbortWithStatusJSON(err.Code(), dto.ApiResponse{
+			Code:    err.Code(),
+			Status:  err.Status(),
+			Message: err.Message(),
 		})
 		return
-	}
-
-	var response []dto.ProductResponse
-	for _, product := range result {
-		response = append(response, product.ToResponse())
 	}
 
 	c.JSON(http.StatusOK, dto.ApiResponse{
@@ -179,22 +139,12 @@ func (p productController) HandleGetProductById(c *gin.Context) {
 		return
 	}
 
-	result, err := p.productRepository.GetProductById(productId)
-	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			c.AbortWithStatusJSON(http.StatusNotFound, dto.ApiResponse{
-				Code:    http.StatusNotFound,
-				Status:  "NOT_FOUND",
-				Message: "Product not found",
-			})
-			return
-		}
-
-		log.Println(err)
-		c.AbortWithStatusJSON(http.StatusInternalServerError, dto.ApiResponse{
-			Code:    http.StatusInternalServerError,
-			Status:  "INTERNAL_SERVER_ERROR",
-			Message: "An error occurred while processing your request. Please try again later",
+	response, errs := p.productService.GetProductById(productId)
+	if errs != nil {
+		c.AbortWithStatusJSON(errs.Code(), dto.ApiResponse{
+			Code:    errs.Code(),
+			Status:  errs.Status(),
+			Message: errs.Message(),
 		})
 		return
 	}
@@ -203,6 +153,6 @@ func (p productController) HandleGetProductById(c *gin.Context) {
 		Code:    http.StatusOK,
 		Status:  "OK",
 		Message: "Product retrieved successfully",
-		Data:    result.ToResponse(),
+		Data:    response,
 	})
 }

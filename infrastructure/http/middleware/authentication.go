@@ -3,7 +3,7 @@ package middleware
 import (
 	"github.com/gin-gonic/gin"
 	"go-product/domain/dto"
-	"go-product/helpers"
+	"go-product/pkg/helpers"
 	"net/http"
 )
 

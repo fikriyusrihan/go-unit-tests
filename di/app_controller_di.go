@@ -4,6 +4,7 @@ import (
 	"go-product/controllers"
 	"go-product/infrastructure/db"
 	"go-product/repositories"
+	"go-product/services"
 )
 
 func InitializeAppController() (controllers.AppController, error) {
@@ -15,8 +16,11 @@ func InitializeAppController() (controllers.AppController, error) {
 	userRepository := repositories.NewUserRepository(database)
 	productRepository := repositories.NewProductRepository(database)
 
-	authController := controllers.NewAuthController(userRepository)
-	productController := controllers.NewProductController(userRepository, productRepository)
+	authService := services.NewAuthService(userRepository)
+	productService := services.NewProductService(productRepository)
+
+	authController := controllers.NewAuthController(authService)
+	productController := controllers.NewProductController(productService)
 
 	return controllers.NewAppController(authController, productController), nil
 }

@@ -31,7 +31,7 @@ func ReadConfig() {
 
 	viper.SetConfigName("config")
 	viper.SetConfigType("yml")
-	viper.AddConfigPath("./config")
+	viper.AddConfigPath("./domain/config")
 	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err != nil {
