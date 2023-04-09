@@ -2,8 +2,8 @@ package db
 
 import (
 	"fmt"
-	"go-product/config"
-	"go-product/domain"
+	"go-product/domain/config"
+	"go-product/domain/entity"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"log"
@@ -28,7 +28,7 @@ func NewPostgresDB() (*gorm.DB, error) {
 		return nil, err
 	}
 
-	err = db.Debug().AutoMigrate(&domain.User{}, &domain.Product{})
+	err = db.Debug().AutoMigrate(&entity.User{}, &entity.Product{})
 	if err != nil {
 		return nil, err
 	}

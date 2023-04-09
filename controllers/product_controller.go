@@ -3,8 +3,9 @@ package controllers
 import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	"go-product/domain"
-	"go-product/repository"
+	"go-product/domain/dto"
+	"go-product/domain/entity"
+	"go-product/repositories/i_repositories"
 	"gorm.io/gorm"
 	"log"
 	"net/http"
@@ -12,8 +13,8 @@ import (
 )
 
 type productController struct {
-	userRepository    repository.UserRepository
-	productRepository repository.ProductRepository
+	userRepository    i_repositories.UserRepository
+	productRepository i_repositories.ProductRepository
 }
 
 type ProductController interface {
@@ -25,17 +26,17 @@ type ProductController interface {
 }
 
 func NewProductController(
-	userRepository repository.UserRepository,
-	productRepository repository.ProductRepository,
+	userRepository i_repositories.UserRepository,
+	productRepository i_repositories.ProductRepository,
 ) ProductController {
 	return &productController{userRepository, productRepository}
 }
 
 func (p productController) HandleCreateProduct(c *gin.Context) {
-	payload := c.MustGet("payload").(domain.ProductRequest)
+	payload := c.MustGet("payload").(dto.ProductRequest)
 	claim := c.MustGet("claim").(jwt.MapClaims)
 
-	var product domain.Product
+	var product entity.Product
 	product.FromRequest(payload)
 
 	uid := uint(claim["id"].(float64))
@@ -44,7 +45,7 @@ func (p productController) HandleCreateProduct(c *gin.Context) {
 	result, err := p.productRepository.CreateProduct(&product)
 	if err != nil {
 		log.Println(err)
-		c.AbortWithStatusJSON(http.StatusInternalServerError, domain.ApiResponse{
+		c.AbortWithStatusJSON(http.StatusInternalServerError, dto.ApiResponse{
 			Code:    http.StatusInternalServerError,
 			Status:  "INTERNAL_SERVER_ERROR",
 			Message: "An error occurred while processing your request. Please try again later",
@@ -52,7 +53,7 @@ func (p productController) HandleCreateProduct(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, domain.ApiResponse{
+	c.JSON(http.StatusOK, dto.ApiResponse{
 		Code:    http.StatusCreated,
 		Status:  "CREATED",
 		Message: "Product created successfully",
@@ -61,14 +62,14 @@ func (p productController) HandleCreateProduct(c *gin.Context) {
 }
 
 func (p productController) HandleUpdateProduct(c *gin.Context) {
-	payload := c.MustGet("payload").(domain.ProductRequest)
+	payload := c.MustGet("payload").(dto.ProductRequest)
 
-	var product domain.Product
+	var product entity.Product
 	product.FromRequest(payload)
 
 	productId, err := strconv.Atoi(c.Param("productId"))
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, domain.ApiResponse{
+		c.AbortWithStatusJSON(http.StatusBadRequest, dto.ApiResponse{
 			Code:    http.StatusBadRequest,
 			Status:  "BAD_REQUEST",
 			Message: "Invalid product id",
@@ -79,7 +80,7 @@ func (p productController) HandleUpdateProduct(c *gin.Context) {
 	result, err := p.productRepository.UpdateProduct(productId, &product)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			c.AbortWithStatusJSON(http.StatusNotFound, domain.ApiResponse{
+			c.AbortWithStatusJSON(http.StatusNotFound, dto.ApiResponse{
 				Code:    http.StatusNotFound,
 				Status:  "NOT_FOUND",
 				Message: "Product not found",
@@ -88,7 +89,7 @@ func (p productController) HandleUpdateProduct(c *gin.Context) {
 		}
 
 		log.Println(err)
-		c.AbortWithStatusJSON(http.StatusInternalServerError, domain.ApiResponse{
+		c.AbortWithStatusJSON(http.StatusInternalServerError, dto.ApiResponse{
 			Code:    http.StatusInternalServerError,
 			Status:  "INTERNAL_SERVER_ERROR",
 			Message: "An error occurred while processing your request. Please try again later",
@@ -96,7 +97,7 @@ func (p productController) HandleUpdateProduct(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, domain.ApiResponse{
+	c.JSON(http.StatusOK, dto.ApiResponse{
 		Code:    http.StatusOK,
 		Status:  "OK",
 		Message: "Product updated successfully",
@@ -107,7 +108,7 @@ func (p productController) HandleUpdateProduct(c *gin.Context) {
 func (p productController) HandleDeleteProduct(c *gin.Context) {
 	productId, err := strconv.Atoi(c.Param("productId"))
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, domain.ApiResponse{
+		c.AbortWithStatusJSON(http.StatusBadRequest, dto.ApiResponse{
 			Code:    http.StatusBadRequest,
 			Status:  "BAD_REQUEST",
 			Message: "Invalid product id",
@@ -118,7 +119,7 @@ func (p productController) HandleDeleteProduct(c *gin.Context) {
 	err = p.productRepository.DeleteProduct(productId)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			c.AbortWithStatusJSON(http.StatusNotFound, domain.ApiResponse{
+			c.AbortWithStatusJSON(http.StatusNotFound, dto.ApiResponse{
 				Code:    http.StatusNotFound,
 				Status:  "NOT_FOUND",
 				Message: "Product not found",
@@ -127,7 +128,7 @@ func (p productController) HandleDeleteProduct(c *gin.Context) {
 		}
 
 		log.Println(err)
-		c.AbortWithStatusJSON(http.StatusInternalServerError, domain.ApiResponse{
+		c.AbortWithStatusJSON(http.StatusInternalServerError, dto.ApiResponse{
 			Code:    http.StatusInternalServerError,
 			Status:  "INTERNAL_SERVER_ERROR",
 			Message: "An error occurred while processing your request. Please try again later",
@@ -135,7 +136,7 @@ func (p productController) HandleDeleteProduct(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, domain.ApiResponse{
+	c.JSON(http.StatusOK, dto.ApiResponse{
 		Code:    http.StatusOK,
 		Status:  "OK",
 		Message: "Product deleted successfully",
@@ -146,7 +147,7 @@ func (p productController) HandleGetAllProduct(c *gin.Context) {
 	result, err := p.productRepository.GetProducts()
 	if err != nil {
 		log.Println(err)
-		c.AbortWithStatusJSON(http.StatusInternalServerError, domain.ApiResponse{
+		c.AbortWithStatusJSON(http.StatusInternalServerError, dto.ApiResponse{
 			Code:    http.StatusInternalServerError,
 			Status:  "INTERNAL_SERVER_ERROR",
 			Message: "An error occurred while processing your request. Please try again later",
@@ -154,12 +155,12 @@ func (p productController) HandleGetAllProduct(c *gin.Context) {
 		return
 	}
 
-	var response []domain.ProductResponse
+	var response []dto.ProductResponse
 	for _, product := range result {
 		response = append(response, product.ToResponse())
 	}
 
-	c.JSON(http.StatusOK, domain.ApiResponse{
+	c.JSON(http.StatusOK, dto.ApiResponse{
 		Code:    http.StatusOK,
 		Status:  "OK",
 		Message: "Product list retrieved successfully",
@@ -170,7 +171,7 @@ func (p productController) HandleGetAllProduct(c *gin.Context) {
 func (p productController) HandleGetProductById(c *gin.Context) {
 	productId, err := strconv.Atoi(c.Param("productId"))
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, domain.ApiResponse{
+		c.AbortWithStatusJSON(http.StatusBadRequest, dto.ApiResponse{
 			Code:    http.StatusBadRequest,
 			Status:  "BAD_REQUEST",
 			Message: "Invalid product id",
@@ -181,7 +182,7 @@ func (p productController) HandleGetProductById(c *gin.Context) {
 	result, err := p.productRepository.GetProductById(productId)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			c.AbortWithStatusJSON(http.StatusNotFound, domain.ApiResponse{
+			c.AbortWithStatusJSON(http.StatusNotFound, dto.ApiResponse{
 				Code:    http.StatusNotFound,
 				Status:  "NOT_FOUND",
 				Message: "Product not found",
@@ -190,7 +191,7 @@ func (p productController) HandleGetProductById(c *gin.Context) {
 		}
 
 		log.Println(err)
-		c.AbortWithStatusJSON(http.StatusInternalServerError, domain.ApiResponse{
+		c.AbortWithStatusJSON(http.StatusInternalServerError, dto.ApiResponse{
 			Code:    http.StatusInternalServerError,
 			Status:  "INTERNAL_SERVER_ERROR",
 			Message: "An error occurred while processing your request. Please try again later",
@@ -198,7 +199,7 @@ func (p productController) HandleGetProductById(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, domain.ApiResponse{
+	c.JSON(http.StatusOK, dto.ApiResponse{
 		Code:    http.StatusOK,
 		Status:  "OK",
 		Message: "Product retrieved successfully",

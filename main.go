@@ -1,8 +1,8 @@
 package main
 
 import (
-	"go-product/config"
 	"go-product/di"
+	"go-product/domain/config"
 	"go-product/infrastructure/http/router"
 	"log"
 )

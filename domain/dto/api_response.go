@@ -1,4 +1,4 @@
-package domain
+package dto
 
 type ApiResponse struct {
 	Code    int         `json:"code"`

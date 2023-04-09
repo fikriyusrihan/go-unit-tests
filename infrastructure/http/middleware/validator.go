@@ -2,16 +2,16 @@ package middleware
 
 import (
 	"github.com/gin-gonic/gin"
-	"go-product/domain"
+	"go-product/domain/dto"
 	"go-product/helpers"
 	"net/http"
 )
 
 func UserRequestValidator() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var request domain.UserRequest
+		var request dto.UserRequest
 		if err := c.ShouldBindJSON(&request); err != nil {
-			c.AbortWithStatusJSON(http.StatusBadRequest, domain.ApiResponse{
+			c.AbortWithStatusJSON(http.StatusBadRequest, dto.ApiResponse{
 				Code:    http.StatusBadRequest,
 				Status:  "BAD_REQUEST",
 				Message: "Invalid request body. Please check your request body and try again",
@@ -20,7 +20,7 @@ func UserRequestValidator() gin.HandlerFunc {
 		}
 
 		if err := helpers.Validate(request); err != nil {
-			c.AbortWithStatusJSON(http.StatusBadRequest, domain.ApiResponse{
+			c.AbortWithStatusJSON(http.StatusBadRequest, dto.ApiResponse{
 				Code:    http.StatusBadRequest,
 				Status:  "BAD_REQUEST",
 				Message: "Invalid request body. Please check your request body and try again",
@@ -35,9 +35,9 @@ func UserRequestValidator() gin.HandlerFunc {
 
 func AuthRequestValidator() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var request domain.AuthenticationRequest
+		var request dto.AuthenticationRequest
 		if err := c.ShouldBindJSON(&request); err != nil {
-			c.AbortWithStatusJSON(http.StatusBadRequest, domain.ApiResponse{
+			c.AbortWithStatusJSON(http.StatusBadRequest, dto.ApiResponse{
 				Code:    http.StatusBadRequest,
 				Status:  "BAD_REQUEST",
 				Message: "Invalid request body. Please check your request body and try again",
@@ -46,7 +46,7 @@ func AuthRequestValidator() gin.HandlerFunc {
 		}
 
 		if err := helpers.Validate(request); err != nil {
-			c.AbortWithStatusJSON(http.StatusBadRequest, domain.ApiResponse{
+			c.AbortWithStatusJSON(http.StatusBadRequest, dto.ApiResponse{
 				Code:    http.StatusBadRequest,
 				Status:  "BAD_REQUEST",
 				Message: "Invalid request body. Please check your request body and try again",
@@ -61,9 +61,9 @@ func AuthRequestValidator() gin.HandlerFunc {
 
 func ProductRequestValidator() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var request domain.ProductRequest
+		var request dto.ProductRequest
 		if err := c.ShouldBindJSON(&request); err != nil {
-			c.AbortWithStatusJSON(http.StatusBadRequest, domain.ApiResponse{
+			c.AbortWithStatusJSON(http.StatusBadRequest, dto.ApiResponse{
 				Code:    http.StatusBadRequest,
 				Status:  "BAD_REQUEST",
 				Message: "Invalid request body. Please check your request body and try again",
@@ -72,7 +72,7 @@ func ProductRequestValidator() gin.HandlerFunc {
 		}
 
 		if err := helpers.Validate(request); err != nil {
-			c.AbortWithStatusJSON(http.StatusBadRequest, domain.ApiResponse{
+			c.AbortWithStatusJSON(http.StatusBadRequest, dto.ApiResponse{
 				Code:    http.StatusBadRequest,
 				Status:  "BAD_REQUEST",
 				Message: "Invalid request body. Please check your request body and try again",

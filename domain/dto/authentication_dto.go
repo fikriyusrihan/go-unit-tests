@@ -1,4 +1,4 @@
-package domain
+package dto
 
 type AuthenticationRequest struct {
 	Email    string `json:"email" validate:"required,email"`
