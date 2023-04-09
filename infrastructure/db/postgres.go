@@ -11,13 +11,14 @@ import (
 )
 
 var (
-	db  *gorm.DB
-	err error
+	host = os.Getenv("PGHOST")
+	db   *gorm.DB
+	err  error
 )
 
 func NewPostgresDB() (*gorm.DB, error) {
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s",
-		os.Getenv("PGHOST"),
+		host,
 		os.Getenv("PGUSER"),
 		os.Getenv("PGPASSWORD"),
 		os.Getenv("PGDATABASE"),
