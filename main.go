@@ -5,7 +5,6 @@ import (
 	"go-product/di"
 	"go-product/infrastructure/http/router"
 	"log"
-	"os"
 )
 
 func main() {
@@ -17,7 +16,7 @@ func main() {
 		return
 	}
 
-	ServerPort := ":" + os.Getenv("PORT")
+	ServerPort := ":" + config.C.Server.Port
 	log.Println("server will run on port: ", ServerPort)
 	err = router.NewRouter(appController).Run(ServerPort)
 	if err != nil {

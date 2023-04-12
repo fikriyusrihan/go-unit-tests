@@ -52,7 +52,7 @@ func (ctr authController) HandleUserRegister(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, dto.ApiResponse{
+	c.JSON(http.StatusCreated, dto.ApiResponse{
 		Code:    http.StatusCreated,
 		Status:  "CREATED",
 		Message: "User created successfully",

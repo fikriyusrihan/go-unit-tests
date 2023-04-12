@@ -8,8 +8,8 @@ type Error interface {
 
 type ErrorData struct {
 	MessageData string `json:"message"`
-	CodeData    int    `json:"status"`
-	StatusData  string `json:"error"`
+	CodeData    int    `json:"code"`
+	StatusData  string `json:"status"`
 }
 
 func (e ErrorData) Message() string {
